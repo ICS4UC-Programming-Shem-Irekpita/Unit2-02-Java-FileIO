@@ -1,76 +1,45 @@
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
-/**
- * This code reads integers from input.txt line by line, sums each line,
- * and writes the result (or an error message) to output.txt.
- * If input.txt does not exist, it is created with sample data.
- *
- * @author  Shem Irekpita
- * @version 1.0
- * @since   2026-10-10
- */
-public final class FileIO {
+public class FileIO {
+    public static void main(String[] args) {
+        // 1 & 2. Initialize File object and open input.txt
+        File inputFile = new File("input.txt");
+        int sum = 0; // set sum = 0
 
-    /**
-     * Utility class constructor.
-     */
-    private FileIO() {
-    }
-
-    /**
-     * Main entry point for file IO processing.
-     *
-     * @param args Command-line arguments.
-     */
-    public static void main(final String[] args) {
-        try {
-            File inputFile = new File("input.txt");
-
-            if (!inputFile.exists()) {
-                FileWriter starter = new FileWriter(inputFile);
-                starter.write("1 2 3\n4 five 6\n-3 7 2\n\n0\n");
-                starter.close();
-            }
-
-            Scanner input = new Scanner(inputFile);
-            FileWriter output = new FileWriter("output.txt");
-
-            while (input.hasNextLine()) {
-                String line = input.nextLine().trim();
-
-                if (line.isEmpty()) {
-                    output.write("Error: no data on this line\n");
+        // 3. Initialize Scanner object
+        try (Scanner sc = new Scanner(inputFile)) {
+            // While sc has next line
+            while (sc.hasNextLine()) {
+                String numStr = sc.nextLine().trim();
+                if (numStr.isEmpty()) {
                     continue;
                 }
 
-                String[] pieces = line.split(" ");
-                int sum = 0;
-                String badValue = null;
-
-                for (String piece : pieces) {
-                    try {
-                        sum += Integer.parseInt(piece);
-                    } catch (NumberFormatException error) {
-                        badValue = piece;
-                        break;
-                    }
-                }
-
-                if (badValue == null) {
-                    output.write(sum + "\n");
-                } else {
-                    output.write("Error: \"" + badValue
-                        + "\" is not a valid integer\n");
+                // Try converting line to integer and sum
+                try {
+                    int num = Integer.parseInt(numStr);
+                    sum += num;
+                } catch (NumberFormatException e) {
+                    // Catch exception if string/float conversion fails
+                    System.out.println(numStr + " is invalid");
                 }
             }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: input.txt file not found.");
+            return;
+        }
 
-            input.close();
-            output.close();
-        } catch (IOException error) {
-            System.out.println("File error: " + error.getMessage());
+        // Display total sum in console
+        System.out.println(sum);
+
+        // Open output.txt and write the sum
+        try (PrintWriter writer = new PrintWriter("output.txt")) {
+            writer.println(sum);
+        } catch (FileNotFoundException e) {
+            System.out.println("Error writing to output.txt");
         }
     }
 }

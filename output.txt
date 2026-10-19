@@ -1,5 +1,1 @@
-6
-Error: "five" is not a valid integer
-6
-Error: no data on this line
-0
+48
